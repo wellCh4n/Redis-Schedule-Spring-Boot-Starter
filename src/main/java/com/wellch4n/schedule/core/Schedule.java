@@ -12,8 +12,6 @@ import java.util.concurrent.ExecutorService;
 
 /**
  * @author wellCh4n
- * @description
- * @create 2019/09/06
  * 找到银弹，然后开枪
  */
 

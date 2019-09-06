@@ -4,8 +4,6 @@ import java.util.Date;
 
 /**
  * @author wellCh4n
- * @description
- * @create 2019/09/04
  * 找到银弹，然后开枪
  */
 

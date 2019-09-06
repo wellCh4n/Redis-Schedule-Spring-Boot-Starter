@@ -14,13 +14,11 @@ import java.util.concurrent.Executors;
 
 /**
  * @author wellCh4n
- * @description
- * @create 2019/09/06
  * 找到银弹，然后开枪
  */
 
 @Configuration
-@ConditionalOnClass(TaskHandler.class)
+@ConditionalOnClass(RedisProperties.class)
 @EnableConfigurationProperties(RedisProperties.class)
 public class ScheduleAutoConfigure {
 

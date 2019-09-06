@@ -6,8 +6,6 @@ import redis.clients.jedis.JedisPubSub;
 
 /**
  * @author wellCh4n
- * @description
- * @create 2019/09/06
  * 找到银弹，然后开枪
  */
 
