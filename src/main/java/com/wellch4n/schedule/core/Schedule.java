@@ -4,10 +4,12 @@ import com.wellch4n.schedule.listener.KeyExpiredListener;
 import com.wellch4n.schedule.task.TaskHandler;
 import com.wellch4n.schedule.utils.TimeUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationContext;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -19,11 +21,14 @@ import java.util.concurrent.ExecutorService;
 public class Schedule {
     private TaskHandler taskHandler;
 
-    public Schedule(ExecutorService executorService, JedisPool jedisPool) {
+    private ApplicationContext applicationContext;
+
+    public Schedule(ExecutorService executorService, JedisPool jedisPool, ApplicationContext applicationContext) {
         if (executorService == null || jedisPool == null) {
             throw new NullPointerException();
         }
         this.taskHandler = new TaskHandler(executorService, jedisPool);
+        this.applicationContext = applicationContext;
         start();
     }
 
@@ -36,7 +41,7 @@ public class Schedule {
         jedis.configSet("notify-keyspace-events", "Ex");
 
         log.info("Starting subscribe expired key...");
-        Runnable runnable = () -> jedis.subscribe(new KeyExpiredListener(taskHandler), "__keyevent@0__:expired");
+        Runnable runnable = () -> jedis.subscribe(new KeyExpiredListener(taskHandler, applicationContext), "__keyevent@0__:expired");
         Thread subThread = new Thread(runnable);
         subThread.start();
         log.info("Schedule started!");
@@ -49,6 +54,10 @@ public class Schedule {
     public void add(String key, Date invokeTime, Runnable task) {
         int delayTime = TimeUtils.deltaTime(new Date(), invokeTime);
         add(key, delayTime, task);
+    }
+
+    public void add(String key, Integer delayTime, String beanName, String method, List<Object> param) {
+        this.taskHandler.add(key, delayTime, beanName, method, param);
     }
 
     public void remove(String key) {
