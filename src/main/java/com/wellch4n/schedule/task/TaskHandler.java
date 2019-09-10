@@ -3,6 +3,7 @@ package com.wellch4n.schedule.task;
 import com.wellch4n.schedule.enums.TaskTypeEnum;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationContext;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
@@ -23,9 +24,12 @@ public class TaskHandler {
 
     private JedisPool jedisPool;
 
-    public TaskHandler(ExecutorService executorService, JedisPool jedisPool) {
+    private ApplicationContext applicationContext;
+
+    public TaskHandler(ExecutorService executorService, JedisPool jedisPool, ApplicationContext applicationContext) {
         this.taskPool = executorService;
         this.jedisPool = jedisPool;
+        this.applicationContext = applicationContext;
     }
 
     /**
@@ -37,7 +41,7 @@ public class TaskHandler {
      */
     public void add(String key, Integer delayTime, TaskTypeEnum taskTypeEnum, Object... bizParam) {
         try (Jedis jedis = jedisPool.getResource()) {
-            taskTypeEnum.taskClazz.add(jedis, taskMap, key, delayTime, bizParam);
+            taskTypeEnum.getTaskClass().add(jedis, taskMap, key, delayTime, bizParam);
         }
     }
 

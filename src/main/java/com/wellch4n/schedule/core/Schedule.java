@@ -19,14 +19,11 @@ import java.util.concurrent.ExecutorService;
 public class Schedule {
     private TaskHandler taskHandler;
 
-    private ApplicationContext applicationContext;
-
     public Schedule(ExecutorService executorService, JedisPool jedisPool, ApplicationContext applicationContext) {
         if (executorService == null || jedisPool == null) {
             throw new NullPointerException();
         }
-        this.taskHandler = new TaskHandler(executorService, jedisPool);
-        this.applicationContext = applicationContext;
+        this.taskHandler = new TaskHandler(executorService, jedisPool, applicationContext);
         start();
     }
 
@@ -39,7 +36,7 @@ public class Schedule {
         jedis.configSet("notify-keyspace-events", "Ex");
 
         log.info("Starting subscribe expired key...");
-        Runnable runnable = () -> jedis.subscribe(new KeyExpiredListener(taskHandler, applicationContext), "__keyevent@0__:expired");
+        Runnable runnable = () -> jedis.subscribe(new KeyExpiredListener(taskHandler), "__keyevent@0__:expired");
         Thread subThread = new Thread(runnable);
         subThread.start();
         log.info("Schedule started!");

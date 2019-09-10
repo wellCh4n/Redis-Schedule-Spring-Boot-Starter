@@ -51,7 +51,7 @@ public class BeanTask implements Task {
     }
 
     @Override
-    public Runnable taskBody(TaskHandler taskHandler, String message, ApplicationContext applicationContext) {
+    public Runnable taskBody(TaskHandler taskHandler, String message) {
         try {
 
             Jedis jedis = taskHandler.getJedisPool().getResource();
@@ -64,7 +64,7 @@ public class BeanTask implements Task {
             jedis.del(paramKey);
             jedis.close();
 
-            Object beanObject = applicationContext.getBean(beanTaskDTO.getBean());
+            Object beanObject = taskHandler.getApplicationContext().getBean(beanTaskDTO.getBean());
             Method method = beanObject.getClass()
                     .getMethod(beanTaskDTO.getMethod(), getParamsClass(beanTaskDTO.getParam()));
 

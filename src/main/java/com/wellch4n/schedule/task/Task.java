@@ -26,8 +26,7 @@ public interface Task {
      * 任务具体方法
      * @param taskHandler 任务Handler
      * @param message 过期Key
-     * @param applicationContext Spring上下文
      * @return
      */
-    Runnable taskBody(TaskHandler taskHandler, String message, ApplicationContext applicationContext);
+    Runnable taskBody(TaskHandler taskHandler, String message);
 }

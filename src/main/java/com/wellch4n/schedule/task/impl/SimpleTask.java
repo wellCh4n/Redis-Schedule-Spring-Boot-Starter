@@ -34,7 +34,7 @@ public class SimpleTask implements Task {
     }
 
     @Override
-    public Runnable taskBody(TaskHandler taskHandler, String message, ApplicationContext applicationContext) {
+    public Runnable taskBody(TaskHandler taskHandler, String message) {
         Runnable task = taskHandler.getTaskMap().get(message);
         log.info("Schedule task [{}], time={}", message, System.currentTimeMillis());
         return task;

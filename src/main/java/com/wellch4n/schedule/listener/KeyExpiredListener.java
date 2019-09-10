@@ -18,11 +18,8 @@ import redis.clients.jedis.JedisPubSub;
 public class KeyExpiredListener extends JedisPubSub {
     private TaskHandler taskHandler;
 
-    private ApplicationContext applicationContext;
-
-    public KeyExpiredListener(TaskHandler taskHandler, ApplicationContext applicationContext) {
+    public KeyExpiredListener(TaskHandler taskHandler) {
         this.taskHandler = taskHandler;
-        this.applicationContext = applicationContext;
     }
 
     @Override
@@ -37,7 +34,7 @@ public class KeyExpiredListener extends JedisPubSub {
             }
 
             // 实例化任务并到线程池执行
-            Runnable runnable = task.taskBody(taskHandler, message, applicationContext);
+            Runnable runnable = task.taskBody(taskHandler, message);
             taskHandler.getTaskPool().execute(runnable);
         } catch (Exception e) {
             log.info("Schedule task error, key={}, message={}", message, e.getMessage());
