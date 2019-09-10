@@ -6,7 +6,7 @@
 
     <groupId>com.wellch4n</groupId>
     <artifactId>redis-schedule-spring-boot-starter</artifactId>
-    <version>1.0-RELEASE</version>
+    <version>1.1-RELEASE</version>
     <name>redis-schedule-spring-boot-starter</name>
     <description>A task schedule based redis key expire</description>
     <url>https://github.com/wellCh4n/Redis-Schedule-Spring-Boot-Starter</url>

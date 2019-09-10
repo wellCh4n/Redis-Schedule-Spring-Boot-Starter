@@ -14,19 +14,19 @@ public interface Task {
 
     /**
      * 任务提交方法
-     * @param jedis
-     * @param taskMap
-     * @param key
-     * @param delayTime
-     * @param bizObj
+     * @param jedis Jedis实例
+     * @param taskMap Runnable实例映射
+     * @param key 任务Id
+     * @param delayTime 延迟时间
+     * @param bizObj 业务参数
      */
     void add(Jedis jedis, ConcurrentHashMap<String, Runnable> taskMap, String key, Integer delayTime, Object... bizObj);
 
     /**
      * 任务具体方法
-     * @param taskHandler
-     * @param message
-     * @param applicationContext
+     * @param taskHandler 任务Handler
+     * @param message 过期Key
+     * @param applicationContext Spring上下文
      * @return
      */
     Runnable taskBody(TaskHandler taskHandler, String message, ApplicationContext applicationContext);

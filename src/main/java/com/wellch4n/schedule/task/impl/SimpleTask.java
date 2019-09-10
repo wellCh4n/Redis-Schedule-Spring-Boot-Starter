@@ -21,10 +21,6 @@ public class SimpleTask implements Task {
 
     /**
      * 简单任务的增加方法
-     * @param jedis
-     * @param taskMap
-     * @param key
-     * @param delayTime
      * @param bizParam [Runnable]
      */
     @Override
