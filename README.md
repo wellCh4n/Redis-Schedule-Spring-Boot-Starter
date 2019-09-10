@@ -6,7 +6,7 @@
 <dependency>
   <groupId>com.wellch4n</groupId>
   <artifactId>redis-schedule-spring-boot-starter</artifactId>
-  <version>1.0-RELEASE</version>
+  <version>1.1-RELEASE</version>
 </dependency>
 ```
 
