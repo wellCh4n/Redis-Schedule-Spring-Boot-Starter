@@ -1,17 +1,13 @@
 package com.wellch4n.schedule.task;
 
-import com.alibaba.fastjson.JSONObject;
-import com.wellch4n.schedule.domain.BeanTaskDTO;
-import com.wellch4n.schedule.namespace.TaskPrefixNamespace;
+import com.wellch4n.schedule.enums.TaskTypeEnum;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
-import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * @author wellCh4n
@@ -27,10 +23,6 @@ public class TaskHandler {
 
     private JedisPool jedisPool;
 
-    public TaskHandler() {
-        this.taskPool = Executors.newCachedThreadPool();
-    }
-
     public TaskHandler(ExecutorService executorService, JedisPool jedisPool) {
         this.taskPool = executorService;
         this.jedisPool = jedisPool;
@@ -40,40 +32,12 @@ public class TaskHandler {
      * 增加延迟任务
      * @param key
      * @param delayTime
-     * @param task
+     * @param taskTypeEnum
+     * @param bizParam
      */
-    public void add(String key, Integer delayTime, Runnable task) {
-        // 写入过期Key
-        Long now = System.currentTimeMillis();
+    public void add(String key, Integer delayTime, TaskTypeEnum taskTypeEnum, Object... bizParam) {
         try (Jedis jedis = jedisPool.getResource()) {
-            log.info("Add schedule task [{}] task, delayTime={}, time={}", key, delayTime, now);
-            jedis.setex(TaskPrefixNamespace.RUNNABLE + key, delayTime, "");
-            this.taskMap.put(key, task);
-        } catch (Exception e) {
-            log.error("Add key={}, delayTime={} error={}, message={}, time={}", key, delayTime, e.getMessage(), now);
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * 增加Spring Bean任务
-     * @param key
-     * @param delayTime
-     * @param beanName
-     * @param method
-     * @param param
-     */
-    public void add(String key, Integer delayTime, String beanName, String method, List<Object> param) {
-        try (Jedis jedis = jedisPool.getResource()) {
-            int oneDayLater = delayTime + 3600 * 24;
-            jedis.setex(TaskPrefixNamespace.BEAN + key, delayTime, "");
-
-            BeanTaskDTO beanTaskDTO = new BeanTaskDTO();
-            beanTaskDTO.setBean(beanName);
-            beanTaskDTO.setMethod(method);
-            beanTaskDTO.setParam(param);
-            // 参数延迟一天过期
-            jedis.setex(TaskPrefixNamespace.PARAM + key, oneDayLater, JSONObject.toJSONString(beanTaskDTO));
+            taskTypeEnum.taskClazz.add(jedis, taskMap, key, delayTime, bizParam);
         }
     }
 

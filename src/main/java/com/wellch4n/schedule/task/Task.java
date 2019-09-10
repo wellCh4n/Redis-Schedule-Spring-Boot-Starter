@@ -1,6 +1,9 @@
 package com.wellch4n.schedule.task;
 
 import org.springframework.context.ApplicationContext;
+import redis.clients.jedis.Jedis;
+
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author wellCh4n
@@ -10,6 +13,16 @@ import org.springframework.context.ApplicationContext;
 public interface Task {
 
     /**
+     * 任务提交方法
+     * @param jedis
+     * @param taskMap
+     * @param key
+     * @param delayTime
+     * @param bizObj
+     */
+    void add(Jedis jedis, ConcurrentHashMap<String, Runnable> taskMap, String key, Integer delayTime, Object... bizObj);
+
+    /**
      * 任务具体方法
      * @param taskHandler
      * @param message
@@ -17,5 +30,4 @@ public interface Task {
      * @return
      */
     Runnable taskBody(TaskHandler taskHandler, String message, ApplicationContext applicationContext);
-
 }

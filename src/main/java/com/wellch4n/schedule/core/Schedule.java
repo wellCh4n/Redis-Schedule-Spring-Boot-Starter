@@ -1,15 +1,13 @@
 package com.wellch4n.schedule.core;
 
+import com.wellch4n.schedule.enums.TaskTypeEnum;
 import com.wellch4n.schedule.listener.KeyExpiredListener;
 import com.wellch4n.schedule.task.TaskHandler;
-import com.wellch4n.schedule.utils.TimeUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
-import java.util.Date;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -47,17 +45,8 @@ public class Schedule {
         log.info("Schedule started!");
     }
 
-    public void add(String key, Integer delayTime, Runnable task) {
-        this.taskHandler.add(key, delayTime, task);
-    }
-
-    public void add(String key, Date invokeTime, Runnable task) {
-        int delayTime = TimeUtils.deltaTime(new Date(), invokeTime);
-        add(key, delayTime, task);
-    }
-
-    public void add(String key, Integer delayTime, String beanName, String method, List<Object> param) {
-        this.taskHandler.add(key, delayTime, beanName, method, param);
+    public void add(String key, Integer delayTime, TaskTypeEnum taskTypeEnum, Object... bizParam) {
+        this.taskHandler.add(key, delayTime, taskTypeEnum, bizParam);
     }
 
     public void remove(String key) {

@@ -1,9 +1,13 @@
 package com.wellch4n.schedule.task.impl;
 
+import com.wellch4n.schedule.namespace.TaskPrefixNamespace;
 import com.wellch4n.schedule.task.Task;
 import com.wellch4n.schedule.task.TaskHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
+import redis.clients.jedis.Jedis;
+
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author wellCh4n
@@ -15,33 +19,28 @@ import org.springframework.context.ApplicationContext;
 @Slf4j
 public class SimpleTask implements Task {
 
+    /**
+     * 简单任务的增加方法
+     * @param jedis
+     * @param taskMap
+     * @param key
+     * @param delayTime
+     * @param bizParam [Runnable]
+     */
+    @Override
+    public void add(Jedis jedis, ConcurrentHashMap<String, Runnable> taskMap, String key, Integer delayTime,
+                    Object... bizParam) {
+        Long now = System.currentTimeMillis();
+
+        log.info("Add schedule simple task [{}] task, delayTime={}, time={}", key, delayTime, now);
+        jedis.setex(TaskPrefixNamespace.RUNNABLE + key, delayTime, "");
+        taskMap.put(TaskPrefixNamespace.RUNNABLE + key, (Runnable) bizParam[0]);
+    }
+
     @Override
     public Runnable taskBody(TaskHandler taskHandler, String message, ApplicationContext applicationContext) {
         Runnable task = taskHandler.getTaskMap().get(message);
         log.info("Schedule task [{}], time={}", message, System.currentTimeMillis());
         return task;
     }
-
-//    @Override
-//    public void add(Jedis jedis, ConcurrentHashMap<String, Runnable> taskMap, String key, Integer delayTime, Object bizObj) {
-//        Long now = System.currentTimeMillis();
-//        SimpleBizParam param = (SimpleBizParam) bizObj;
-//
-//        log.info("Add schedule task [{}] task, delayTime={}, time={}", key, delayTime, now);
-//        jedis.setex(TaskPrefixNamespace.RUNNABLE + key, delayTime, "");
-//        taskMap.put(key, param.getRunnable());
-//    }
-//
-//
-//    public static class SimpleBizParam {
-//        private Runnable runnable;
-//
-//        public Runnable getRunnable() {
-//            return runnable;
-//        }
-//
-//        public void setRunnable(Runnable runnable) {
-//            this.runnable = runnable;
-//        }
-//    }
 }
