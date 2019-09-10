@@ -1,36 +1,48 @@
 package com.wellch4n.schedule.enums;
 
+import com.wellch4n.schedule.task.Task;
+import com.wellch4n.schedule.task.impl.BeanTask;
+import com.wellch4n.schedule.task.impl.SimpleTask;
+
 /**
  * @author wellCh4n
  * 找到银弹，然后开枪
  */
 
+@SuppressWarnings("unused")
 public enum TaskTypeEnum {
     /**
      * Runnable任务
      */
-    RUNNABLE("runnable"),
+    RUNNABLE("runnable", new SimpleTask()),
 
     /**
      * Spring Bean任务
      */
-    BEAN("bean"),
+    BEAN("bean", new BeanTask()),
 
     /**
      * 跳过的任务
      */
-    IGNORE("ignore"),
+    IGNORE("ignore", null),
 
     // ----------------
     /**
      * 参数
      */
-    PARAM("param");
+    PARAM("param", null);
 
     public String code;
 
-    TaskTypeEnum(String code) {
+    public Task taskClazz;
+
+    TaskTypeEnum(String code, Task taskClazz) {
         this.code = code;
+        this.taskClazz = taskClazz;
+    }
+
+    public Task getTaskClass() {
+        return this.taskClazz;
     }
 
     public static TaskTypeEnum getType(String code) {

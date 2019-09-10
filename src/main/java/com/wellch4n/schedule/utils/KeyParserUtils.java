@@ -1,7 +1,5 @@
 package com.wellch4n.schedule.utils;
 
-import com.alibaba.fastjson.JSONObject;
-import com.wellch4n.schedule.domain.BeanTaskDTO;
 import com.wellch4n.schedule.enums.TaskTypeEnum;
 
 /**
@@ -19,16 +17,5 @@ public class KeyParserUtils {
         }
 
         return TaskTypeEnum.getType(keyArr[0]);
-    }
-
-    public static String getParamKey(String message) {
-        String[] keyArr = message.split(SPLIT_STRING);
-        keyArr[0] = TaskTypeEnum.PARAM.code;
-
-        return String.join(SPLIT_STRING, keyArr);
-    }
-
-    public static BeanTaskDTO getParam(String value) {
-        return JSONObject.parseObject(value, BeanTaskDTO.class);
     }
 }
