@@ -1,6 +1,5 @@
 package com.wellch4n.schedule.task;
 
-import org.springframework.context.ApplicationContext;
 import redis.clients.jedis.Jedis;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -18,9 +17,9 @@ public interface Task {
      * @param taskMap Runnable实例映射
      * @param key 任务Id
      * @param delayTime 延迟时间
-     * @param bizObj 业务参数
+     * @param param 业务参数
      */
-    void add(Jedis jedis, ConcurrentHashMap<String, Runnable> taskMap, String key, Integer delayTime, Object... bizObj);
+    void add(Jedis jedis, ConcurrentHashMap<String, Runnable> taskMap, String key, Integer delayTime, TaskParam param);
 
     /**
      * 任务具体方法

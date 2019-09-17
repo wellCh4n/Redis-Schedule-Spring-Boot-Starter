@@ -1,8 +1,8 @@
 package com.wellch4n.schedule.enums;
 
 import com.wellch4n.schedule.task.Task;
-import com.wellch4n.schedule.task.impl.BeanTask;
 import com.wellch4n.schedule.task.impl.SimpleTask;
+import com.wellch4n.schedule.task.impl.BeanTask;
 
 /**
  * @author wellCh4n

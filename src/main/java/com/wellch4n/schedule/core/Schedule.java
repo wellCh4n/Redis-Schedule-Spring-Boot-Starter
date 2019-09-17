@@ -3,6 +3,7 @@ package com.wellch4n.schedule.core;
 import com.wellch4n.schedule.enums.TaskTypeEnum;
 import com.wellch4n.schedule.listener.KeyExpiredListener;
 import com.wellch4n.schedule.task.TaskHandler;
+import com.wellch4n.schedule.task.TaskParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
 import redis.clients.jedis.Jedis;
@@ -42,8 +43,8 @@ public class Schedule {
         log.info("Schedule started!");
     }
 
-    public void add(String key, Integer delayTime, TaskTypeEnum taskTypeEnum, Object... bizParam) {
-        this.taskHandler.add(key, delayTime, taskTypeEnum, bizParam);
+    public void add(String key, Integer delayTime, TaskTypeEnum taskTypeEnum, TaskParam param) {
+        this.taskHandler.add(key, delayTime, taskTypeEnum, param);
     }
 
     public void remove(String key) {

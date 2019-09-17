@@ -5,6 +5,7 @@ import com.wellch4n.schedule.enums.TaskTypeEnum;
 import com.wellch4n.schedule.namespace.TaskPrefixNamespace;
 import com.wellch4n.schedule.task.Task;
 import com.wellch4n.schedule.task.TaskHandler;
+import com.wellch4n.schedule.task.TaskParam;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
@@ -12,7 +13,6 @@ import redis.clients.jedis.Jedis;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -26,39 +26,25 @@ import java.util.stream.Collectors;
 
 @Slf4j
 public class BeanTask implements Task {
-
     private final static String SPLIT_STRING = "::";
 
     @Override
-    public void add(Jedis jedis, ConcurrentHashMap<String, Runnable> taskMap, String key, Integer delayTime, Object... bizParam) {
-        Long now = System.currentTimeMillis();
-
-        log.info("Add schedule bean task [{}] task, delayTime={}, time={}", key, delayTime, now);
-        jedis.setex(TaskPrefixNamespace.BEAN + key, delayTime, "");
-
-        BeanTaskDTO beanTaskDTO = new BeanTaskDTO();
-        beanTaskDTO.setBean((String) bizParam[0]);
-        beanTaskDTO.setMethod((String) bizParam[1]);
-
-        List<Object> paramList = Arrays.asList(bizParam);
-        paramList = paramList.subList(1, paramList.size() - 1);
-        beanTaskDTO.setParam(paramList);
-
-        // 参数延迟一天过期
+    public void add(Jedis jedis, ConcurrentHashMap<String, Runnable> taskMap, String key, Integer delayTime, TaskParam param) {
+        Param beanParam = (Param) param;
+        String paramKey = TaskPrefixNamespace.PARAM + key;
         int oneDayLater = delayTime + 3600 * 24;
         log.info("bean task [{}] param expired time={}", key, oneDayLater);
-        jedis.setex(TaskPrefixNamespace.PARAM + key, oneDayLater, JSONObject.toJSONString(beanTaskDTO));
+        jedis.setex(paramKey, oneDayLater, JSONObject.toJSONString(beanParam));
     }
 
     @Override
     public Runnable taskBody(TaskHandler taskHandler, String message) {
         try {
-
             Jedis jedis = taskHandler.getJedisPool().getResource();
 
             String paramKey = getParamKey(message);
             String paramValue = jedis.get(paramKey);
-            BeanTaskDTO beanTaskDTO = getScheduleParam(paramValue);
+            Param beanTaskDTO = getScheduleParam(paramValue);
 
             // 立即回收缓存资源
             jedis.del(paramKey);
@@ -76,18 +62,16 @@ public class BeanTask implements Task {
                     e.printStackTrace();
                 }
             };
-        } catch (NoSuchMethodException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
     }
 
     @Data
-    private static class BeanTaskDTO {
+    public static class Param extends TaskParam {
         private String bean;
-
         private String method;
-
         private List<Object> param;
     }
 
@@ -98,8 +82,8 @@ public class BeanTask implements Task {
         return String.join(SPLIT_STRING, keyArr);
     }
 
-    private BeanTaskDTO getScheduleParam(String value) {
-        return JSONObject.parseObject(value, BeanTaskDTO.class);
+    private Param getScheduleParam(String value) {
+        return JSONObject.parseObject(value, Param.class);
     }
 
     private Class[] getParamsClass(List<Object> params) {

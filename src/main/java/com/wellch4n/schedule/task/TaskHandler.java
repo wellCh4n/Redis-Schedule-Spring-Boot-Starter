@@ -37,11 +37,14 @@ public class TaskHandler {
      * @param key
      * @param delayTime
      * @param taskTypeEnum
-     * @param bizParam
+     * @param taskParam
      */
-    public void add(String key, Integer delayTime, TaskTypeEnum taskTypeEnum, Object... bizParam) {
+    public void add(String key, Integer delayTime, TaskTypeEnum taskTypeEnum, TaskParam taskParam) {
+        Long now = System.currentTimeMillis();
         try (Jedis jedis = jedisPool.getResource()) {
-            taskTypeEnum.getTaskClass().add(jedis, taskMap, key, delayTime, bizParam);
+            log.info("Add [{}] task, key={}, delayTime={}s, now={}", taskTypeEnum.code, key, delayTime, now);
+            jedis.setex(taskTypeEnum.code + "::" + key, delayTime, "");
+            taskTypeEnum.getTaskClass().add(jedis, taskMap, key, delayTime, taskParam);
         }
     }
 
